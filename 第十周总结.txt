@@ -1,5 +1,5 @@
                                                                          报告总结    
-这周学的东西很杂，但是我觉得是个好的开始，学了一点github，还有一点php,一点点sql注入
+这周学的东西有点杂，但是我觉得是个好的开始，学了一点github，还有一点php,一点点sql注入
 0x01
     我认识的数据库的结构像excel一样，一行一行的表格，表格里面都存储这数据，一大张表格叫做数据库，还有表单，栏，字段
 举个例子，就像是张三，19岁，1990年9月9日出生，四川成都人，银行卡号:11111111111111 密码：xxxxxx。各种数据的存储在一张表格中，我的了解只有这么多。
@@ -24,20 +24,20 @@
 这时网页报错，猜测是否对表名字进行加密
 将表名字转为16进制，记得开头加0x（0x的目的是为了表示后面的数是十六进制，在编程里面一般都要加入，用来区别十进制数）。
 得到字段就是flag。
-第二种方法添加id=1，然后用sqlmap跑，将bp抓到的包存在txt中，用sqlmap跑数据库。
+第二种方法添加id=1，然后用sqlmap跑，将bp抓到的包存在txt中，用sqlmap跑数据库（注意txt要放在sqlmap的目录下）。
   0x04
 github上传文件
-首先要从官网上下载安装git，用VS Code连接的时候要先配置GitHub。
+首先要从网上下载安装git，连接的时候要先配置GitHub。
 git config --global user.name （名字）
 git config --global user.email (邮箱名)
-以管理员权限运行CMD或VS Code。
-用cd切换路径
 初始化：git init
 连接到库：git remote add origin https://github.com/（用户名）/（库名）.git 
-新建EADME.md文件：git add README.md 
+新建EADME.md文件：git add README.md （根据自己的要求是否使用它）。
 添加当前文件到暂存区：git add . 
-git commit -m "first commit" 
-将文件提交到库的某个分支：git push -u origin （分支名） 
-将添加后的文件提交到head区：git branch -M “描述” （修改分支名）
+将添加后的文件提交到head区：git commit -m "first commit" 
+将文件提交到库的某个分支：git push -u origin 分支名 
+修改分支名：git branch -M 分支名。
 记住本机存文件的文件夹要和库同名，并且库里面不能放文件夹之外的东西，我就吃亏了。
+这些东西我也不知道我哪儿有错误，希望学长们看到了，能指出我的错误，我在从新总结一下。
+谢谢！
 
