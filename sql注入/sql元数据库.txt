@@ -1,0 +1,28 @@
+2020/11/19 SQL注入中information_schema的作用 - 私の目を見て - 博客园
+https://www.cnblogs.com/lcbwwy/p/12670465.html 1/2
+SQL注入中information_schema的作用
+SQL注入中informaon_schema的作用
+information_schema数据库是MySQL自带的,MySQL 5以下没有这个数据库,它提供了访问数据库元数据的方式.什么是元数据呢?元数据是关于
+数据的数据,如数据库名或表名,列的数据类型,或访问权限等.也就是说informaon_schema中保存着关于MySQL服务器所维护的所有其他数据库
+的信息.如数据库名,数据库的表,表栏的数据类型与访问权限等.在INFORMATION_SCHEMA中,有数个只读表.
+在SQL注入中,我们重点关注的表有如下几个,因为主要的时候主要利用这几个表来获取数据:
+SCHEMATA:提供了当前mysql数据库中所有数据库的信息,其中SCHEMA_NAME字
+段保存了所有的数据库名.show databases的结果取自此表.
+TABLES:提供了关于数据库中的表的信息,详细表述了某个表属于哪个schema,表类型,表引擎,创建时间等信息,其中table_name字段保存了所
+有列名信息,show tables from schemaname的结果取自此表.
+COLUMNS:提供了表中的列信息.详细表述了某张表的所有列以及每个列的信息,其中column_name保存了所有的字段信息.show columns
+from
+schemaname.tablename的结果取自此表.
+在注入中,我们可以通过注入select schema_name from schemata 来查询的当前数据库中所有的数据库名.
+如果你去查看一些爆数据库名的注入语句,就会发现里面包含这么一句:select schema_name from information_schema.schemata limit
+0,1,其原理就是通过查询information_schema.schemata中schema_name的结果,其中limit 0，1用来获取第一条记录,通过递增第一个参数,
+可以每次获取一条记录,也就是一次获取一个数据库名,直到出现错误为止,说明没有更多的错误.
+information_schema的TABLES表中的TABLE_SCHEMTA字段是保存的数据库名,而TABLE_NAME保存了表名,那么我们就可以使用
+TABLE_SCHEMTA字段作为查询条件,查询TABLE_NAME,即可得知所有指定数据库中的所有表名.比如,我们想要通过information_schema数
+据库来查询sqli数据库中所有的表,那么就可以使用如下SQL语句:
+select TABLE_NAME from information_schema.TABLES where TABLE_SCHEMA = 'sqli';
+TABLE_SCHEMA保存了这条记录保存的字段所属的数据库名,而TABLE_NAME保存的是该字段所属表名,COLUMN_NAME则是一个列名记录;
+columns中,TABLE_NAME保存了字段所属的表名,TABLE_SCHEMA保存了该字段所属的库名,与通过TABLES表获取表名一样,我们就可以查询
+把TABLE_NAME 和TABLE_SCHEMA做为查询条件,查询符合条件的COLUMN_NAME,也就是查询指定数据库中某表中的字段.
+比如,我们要通过information_schema数据库的columns表查询sqli数据库中user表中所有的字段,可以执行如下SQL语句:
+ select column_name from information_schema.columns where TABLE_SCHEMA='sqli' and TABLE_NAME='user';

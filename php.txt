@@ -53,3 +53,5 @@ echo Car::getName(); //结果为“汽车”
 
 
 class Truck extends Car，extend相当于继承，turck继承了car。
+mcrypt_decrypt — 使用给定参数解密密文
+$_SESSION['userinfo'] = $userinfo什么意思，他的意思是把数组里的数据都保存在名为userinfo的session中了。
